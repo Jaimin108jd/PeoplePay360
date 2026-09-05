@@ -30,6 +30,8 @@ local.db-*
 .DS_Store
 .claude/
 .cursor/
+.agents/
+.github/hooks/
 
 # Logs
 logs
