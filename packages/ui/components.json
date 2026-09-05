@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-lyra",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@PeoplePay360/ui/components",
+    "utils": "@PeoplePay360/ui/lib/utils",
+    "hooks": "@PeoplePay360/ui/hooks",
+    "lib": "@PeoplePay360/ui/lib",
+    "ui": "@PeoplePay360/ui/components"
+  },
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {}
+}
