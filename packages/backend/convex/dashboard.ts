@@ -10,14 +10,27 @@ export const getMetrics = query({
       return null;
     }
 
-    const employees = await ctx.db.query("employees").collect();
-    const departments = await ctx.db.query("departments").collect();
-    const payruns = await ctx.db.query("payruns").collect();
-    const timeOffRequests = await ctx.db.query("timeOffRequests").collect();
-    const contracts = await ctx.db.query("contracts").collect();
-    const attendanceRecords = await ctx.db.query("attendance").collect();
-    const salaryStructures = await ctx.db.query("salaryStructures").collect();
-    const allUsers = await ctx.db.query("users").collect();
+    const [
+      employees,
+      departments,
+      payruns,
+      timeOffRequests,
+      contracts,
+      attendanceRecords,
+      salaryStructures,
+      allUsers,
+      allPayslips,
+    ] = await Promise.all([
+      ctx.db.query("employees").collect(),
+      ctx.db.query("departments").collect(),
+      ctx.db.query("payruns").collect(),
+      ctx.db.query("timeOffRequests").collect(),
+      ctx.db.query("contracts").collect(),
+      ctx.db.query("attendance").collect(),
+      ctx.db.query("salaryStructures").collect(),
+      ctx.db.query("users").collect(),
+      ctx.db.query("payslips").collect(),
+    ]);
 
     const currentEmployee = user.employeeId
       ? await ctx.db.get(user.employeeId)
@@ -30,30 +43,34 @@ export const getMetrics = query({
     let currentContract: any = null;
 
     if (user.employeeId) {
-      employeePayslips = await ctx.db
-        .query("payslips")
-        .withIndex("by_employee", (q) => q.eq("employeeId", user.employeeId!))
-        .collect();
+      const [rawPayslips, rawAttendance, rawTimeOff, rawBalances, timeOffTypes] =
+        await Promise.all([
+          ctx.db
+            .query("payslips")
+            .withIndex("by_employee", (q) => q.eq("employeeId", user.employeeId!))
+            .collect(),
+          ctx.db
+            .query("attendance")
+            .withIndex("by_employee_date", (q) =>
+              q.eq("employeeId", user.employeeId!)
+            )
+            .collect(),
+          ctx.db
+            .query("timeOffRequests")
+            .withIndex("by_employee", (q) => q.eq("employeeId", user.employeeId!))
+            .collect(),
+          ctx.db
+            .query("timeOffAllocations")
+            .withIndex("by_employee_type", (q) =>
+              q.eq("employeeId", user.employeeId!)
+            )
+            .collect(),
+          ctx.db.query("timeOffTypes").collect(),
+        ]);
 
-      employeeAttendance = await ctx.db
-        .query("attendance")
-        .withIndex("by_employee_date", (q) =>
-          q.eq("employeeId", user.employeeId!)
-        )
-        .collect();
-
-      employeeTimeOff = await ctx.db
-        .query("timeOffRequests")
-        .withIndex("by_employee", (q) => q.eq("employeeId", user.employeeId!))
-        .collect();
-
-      const rawBalances = await ctx.db
-        .query("timeOffAllocations")
-        .withIndex("by_employee_type", (q) =>
-          q.eq("employeeId", user.employeeId!)
-        )
-        .collect();
-      const timeOffTypes = await ctx.db.query("timeOffTypes").collect();
+      employeePayslips = rawPayslips;
+      employeeAttendance = rawAttendance;
+      employeeTimeOff = rawTimeOff;
       const typeMap = new Map(timeOffTypes.map((t) => [t._id, t.name]));
       employeeLeaveBalances = rawBalances.map((b) => ({
         ...b,
@@ -80,7 +97,6 @@ export const getMetrics = query({
     const validatedPayruns = payruns.filter((p) => p.status === "validated");
     const paidPayruns = payruns.filter((p) => p.status === "paid");
 
-    const allPayslips = await ctx.db.query("payslips").collect();
     const totalGrossLiability = allPayslips.reduce(
       (acc, p) => acc + (p.gross || 0),
       0
@@ -92,6 +108,12 @@ export const getMetrics = query({
     const payslipWarningsCount = allPayslips.filter(
       (p) => p.warnings && p.warnings.length > 0
     ).length;
+
+    const employeeMap = new Map(employees.map((e) => [e._id, e.name]));
+    const pendingLeaveQueue = pendingLeaveApprovals.slice(0, 5).map((r) => ({
+      ...r,
+      employeeName: employeeMap.get(r.employeeId) ?? "Employee",
+    }));
 
     return {
       counts: {
@@ -116,7 +138,7 @@ export const getMetrics = query({
       employeeLeaveBalances,
       employeePayslips,
       employeeTimeOff,
-      pendingLeaveRequests: pendingLeaveApprovals.slice(0, 5),
+      pendingLeaveRequests: pendingLeaveQueue,
       recentPayruns: payruns.slice(-5).reverse(),
       user: {
         _id: user._id,
