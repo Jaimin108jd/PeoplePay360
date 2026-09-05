@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useCurrentUser } from "../../../lib/current-user";
 import { statusColors } from "../../../lib/status-colors";
 
 export const Route = createFileRoute("/_authed/attendance/")({
@@ -23,11 +24,7 @@ export const Route = createFileRoute("/_authed/attendance/")({
 
 export function AttendancePage() {
   const { user } = useUser();
-
-  const currentUser = useQuery(
-    api.users.me,
-    user?.id ? { clerkId: user.id } : {}
-  );
+  const currentUser = useCurrentUser();
 
   const [dateFilter, setDateFilter] = useState<string>("");
   const [employeeFilter, setEmployeeFilter] = useState<string>("all");
@@ -40,8 +37,9 @@ export function AttendancePage() {
   // Queries
   const records = useQuery(
     api.attendance.list,
-    currentUser
+    currentUser && user?.id
       ? {
+          clerkId: user.id,
           date: dateFilter || undefined,
           employeeId:
             employeeFilter === "all"
@@ -54,7 +52,7 @@ export function AttendancePage() {
 
   const todayStatus = useQuery(
     api.attendance.getTodayStatus,
-    currentUser ? {} : "skip"
+    currentUser && user?.id ? { clerkId: user.id } : "skip"
   );
 
   const employees = useQuery(

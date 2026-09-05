@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useCurrentUser } from "../../../lib/current-user";
 import { statusColors } from "../../../lib/status-colors";
 
 export const Route = createFileRoute("/_authed/contracts/")({
@@ -66,11 +67,7 @@ function StatusBadge({ status }: { status: ContractStatus }) {
 
 export function ContractsPage() {
   const { user } = useUser();
-
-  const currentUser = useQuery(
-    api.users.me,
-    user?.id ? { clerkId: user.id } : "skip"
-  );
+  const currentUser = useCurrentUser();
 
   const contracts = useQuery(
     api.contracts.list,
@@ -86,7 +83,9 @@ export function ContractsPage() {
   );
   const salaryStructures = useQuery(
     api.salaryStructures.list,
-    currentUser && currentUser.role !== "employee" ? {} : "skip"
+    currentUser && currentUser.role !== "employee" && user?.id
+      ? { clerkId: user.id }
+      : "skip"
   );
 
   const createContract = useMutation(api.contracts.create);

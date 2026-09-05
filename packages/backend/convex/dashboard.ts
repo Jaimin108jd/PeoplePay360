@@ -5,7 +5,7 @@ import { getCurrentUser } from "./lib/rbac";
 export const getMetrics = query({
   args: { clerkId: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getCurrentUser(ctx, args.clerkId);
     if (!user) {
       return null;
     }

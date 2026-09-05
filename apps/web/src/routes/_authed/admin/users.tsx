@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCurrentUser } from "../../../lib/current-user";
 
 export const Route = createFileRoute("/_authed/admin/users")({
   component: AdminUsersPage,
@@ -50,18 +51,16 @@ const ROLES = [
 
 function AdminUsersPage() {
   const { user } = useUser();
-  const currentUser = useQuery(
-    api.users.me,
-    user?.id ? { clerkId: user.id } : {}
-  );
+  const currentUser = useCurrentUser();
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
 
   const users = useQuery(
     api.users.list,
-    currentUser?.role === "admin"
+    currentUser?.role === "admin" && user?.id
       ? {
+          clerkId: user.id,
           role: roleFilter === "all" ? undefined : roleFilter,
           search: search.trim() ? search.trim() : undefined,
         }
@@ -69,7 +68,7 @@ function AdminUsersPage() {
   );
   const employees = useQuery(
     api.users.listEmployeesForLinking,
-    currentUser?.role === "admin" ? {} : "skip"
+    currentUser?.role === "admin" && user?.id ? { clerkId: user.id } : "skip"
   );
   const updateRole = useMutation(api.users.updateRole);
   const linkEmployee = useMutation(api.users.linkEmployee);

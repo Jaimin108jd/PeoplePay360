@@ -1,7 +1,5 @@
-import { api } from "@PeoplePay360/backend/convex/_generated/api";
-import { UserButton, useUser } from "@clerk/tanstack-react-start";
+import { UserButton } from "@clerk/tanstack-react-start";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
 import {
   BarChart3,
   BookOpen,
@@ -14,6 +12,7 @@ import {
   Tags,
   Users,
 } from "lucide-react";
+import { useCurrentUser } from "../lib/current-user";
 import { ThemeToggle } from "./theme-toggle";
 
 const NAV_ITEMS = [
@@ -29,11 +28,7 @@ export function Sidebar() {
   const {
     location: { pathname },
   } = useRouterState();
-  const { user } = useUser();
-  const currentUser = useQuery(
-    api.users.me,
-    user?.id ? { clerkId: user.id } : {}
-  );
+  const currentUser = useCurrentUser();
 
   const isAdmin = currentUser?.role === "admin";
   const canViewPayroll = [

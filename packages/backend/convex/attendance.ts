@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { internalMutation, mutation, query } from "./_generated/server";
-import { requireMinRole, requireUser } from "./lib/rbac";
+import { getCurrentUser, requireMinRole, requireUser } from "./lib/rbac";
 
 export const attendanceStatusValidator = v.union(
   v.literal("present"),
@@ -88,7 +88,10 @@ export const list = query({
     status: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const user = await requireUser(ctx, args.clerkId);
+    const user = await getCurrentUser(ctx, args.clerkId);
+    if (!user) {
+      return [];
+    }
 
     let effectiveEmployeeId = args.employeeId;
 
@@ -266,7 +269,10 @@ export const getTodayStatus = query({
     employeeId: v.optional(v.id("employees")),
   },
   handler: async (ctx, args) => {
-    const user = await requireUser(ctx, args.clerkId);
+    const user = await getCurrentUser(ctx, args.clerkId);
+    if (!user) {
+      return null;
+    }
     const targetEmpId = args.employeeId ?? user.employeeId;
 
     if (!targetEmpId) {

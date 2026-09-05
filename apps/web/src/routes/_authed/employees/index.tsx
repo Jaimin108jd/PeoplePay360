@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCurrentUser } from "../../../lib/current-user";
 import {
   adminCreateClerkUserFn,
   adminDeleteClerkUserFn,
@@ -129,11 +130,8 @@ function isValidPassword(password: string): boolean {
 
 export function EmployeesDirectoryPage() {
   const { user } = useUser();
+  const currentUser = useCurrentUser();
 
-  const currentUser = useQuery(
-    api.users.me,
-    user?.id ? { clerkId: user.id } : {}
-  );
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");

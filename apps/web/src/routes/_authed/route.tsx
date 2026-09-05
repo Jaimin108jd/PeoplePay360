@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 
 import { ErrorBoundary } from "../../components/error-boundary";
 import { Sidebar } from "../../components/sidebar";
+import { CurrentUserProvider } from "../../lib/current-user";
 
 export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context }) => {
@@ -106,14 +107,16 @@ function AuthedLayout() {
 
   return (
     <UserSyncWrapper>
-      <div className="flex h-svh overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto">
-          <ErrorBoundary>
-            <Outlet />
-          </ErrorBoundary>
-        </main>
-      </div>
+      <CurrentUserProvider>
+        <div className="flex h-svh overflow-hidden">
+          <Sidebar />
+          <main className="flex-1 overflow-y-auto">
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
+          </main>
+        </div>
+      </CurrentUserProvider>
     </UserSyncWrapper>
   );
 }
