@@ -28,6 +28,8 @@ local.db-*
 *.swo
 *~
 .DS_Store
+.claude/
+.cursor/
 
 # Logs
 logs

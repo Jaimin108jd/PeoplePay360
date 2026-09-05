@@ -1,20 +1,20 @@
+import { env } from "@PeoplePay360/env/web";
+import { Toaster } from "@PeoplePay360/ui/components/sonner";
 import { ClerkProvider, useAuth } from "@clerk/tanstack-react-start";
 import { auth } from "@clerk/tanstack-react-start/server";
 import type { ConvexQueryClient } from "@convex-dev/react-query";
-import { Toaster } from "@PeoplePay360/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
 import {
+  createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
-  createRootRouteWithContext,
   useRouteContext,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
-
-import Header from "../components/header";
+import { ThemeProvider } from "next-themes";
 
 import appCss from "../index.css?url";
 
@@ -25,8 +25,8 @@ const fetchClerkAuth = createServerFn({ method: "GET" }).handler(async () => {
 });
 
 export interface RouterAppContext {
-  queryClient: QueryClient;
   convexQueryClient: ConvexQueryClient;
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -64,19 +64,26 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 function RootDocument() {
   const context = useRouteContext({ from: Route.id });
   return (
-    <ClerkProvider>
-      <ConvexProviderWithClerk client={context.convexQueryClient.convexClient} useAuth={useAuth}>
-        <html lang="en" className="dark">
+    <ClerkProvider publishableKey={env.VITE_CLERK_PUBLISHABLE_KEY}>
+      <ConvexProviderWithClerk
+        client={context.convexQueryClient.convexClient}
+        useAuth={useAuth}
+      >
+        <html lang="en" suppressHydrationWarning>
           <head>
             <HeadContent />
           </head>
           <body>
-            <div className="grid h-svh grid-rows-[auto_1fr]">
-              <Header />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              disableTransitionOnChange
+              enableSystem
+            >
               <Outlet />
-            </div>
-            <Toaster richColors />
-            <TanStackRouterDevtools position="bottom-left" />
+              <Toaster richColors />
+              <TanStackRouterDevtools position="bottom-left" />
+            </ThemeProvider>
             <Scripts />
           </body>
         </html>

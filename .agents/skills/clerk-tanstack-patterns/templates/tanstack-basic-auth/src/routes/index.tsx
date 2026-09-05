@@ -1,4 +1,4 @@
-import { Show, UserButton, SignInButton } from "@clerk/tanstack-react-start";
+import { Show, SignInButton, UserButton } from "@clerk/tanstack-react-start";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({

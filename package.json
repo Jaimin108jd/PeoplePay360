@@ -1,6 +1,7 @@
 {
   "name": "PeoplePay360",
   "private": true,
+  "type": "module",
   "workspaces": {
     "packages": [
       "apps/*",
@@ -22,22 +23,21 @@
       "@types/react-dom": "^19.2.3"
     }
   },
-  "type": "module",
   "scripts": {
-    "dev": "turbo run dev",
     "build": "turbo run build",
+    "check": "ultracite check",
     "check-types": "turbo run check-types",
-    "dev:web": "turbo run dev -F web --",
+    "deploy": "vercel deploy",
+    "deploy:check": "vercel deploy --dry",
+    "deploy:prod": "vercel deploy --prod",
+    "deploy:setup": "vercel link",
+    "dev": "turbo run dev",
     "dev:server": "turbo run dev -F @PeoplePay360/backend --",
     "dev:setup": "turbo run dev:setup -F @PeoplePay360/backend --",
-    "deploy:setup": "vercel link",
     "dev:vercel": "vercel dev -L",
+    "dev:web": "turbo run dev -F web --",
     "env:preview": "tsx scripts/sync-vercel-env.ts preview",
     "env:production": "tsx scripts/sync-vercel-env.ts production",
-    "deploy": "vercel deploy",
-    "deploy:prod": "vercel deploy --prod",
-    "deploy:check": "vercel deploy --dry",
-    "check": "ultracite check",
     "fix": "ultracite fix"
   },
   "dependencies": {

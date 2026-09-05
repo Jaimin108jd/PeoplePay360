@@ -7,11 +7,11 @@ const convexUrlSchema = (exampleHost: string) =>
   });
 
 export const env = createEnv({
-  clientPrefix: "VITE_",
   client: {
-    VITE_CONVEX_URL: convexUrlSchema("example.convex.cloud"),
     VITE_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+    VITE_CONVEX_URL: convexUrlSchema("example.convex.cloud"),
   },
-  runtimeEnv: (import.meta as any).env,
+  clientPrefix: "VITE_",
   emptyStringAsUndefined: true,
+  runtimeEnv: (import.meta as any).env,
 });

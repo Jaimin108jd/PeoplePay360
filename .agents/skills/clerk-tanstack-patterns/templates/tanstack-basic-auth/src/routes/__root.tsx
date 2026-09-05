@@ -1,8 +1,13 @@
 import { ClerkProvider } from "@clerk/tanstack-react-start";
-import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  HeadContent,
+  Outlet,
+  Scripts,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 /// <reference types="vite/client" />
-import * as React from "react";
+import type * as React from "react";
 
 export const Route = createRootRoute({
   component: RootComponent,

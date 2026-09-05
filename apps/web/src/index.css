@@ -1,1 +1,32 @@
 @import "@PeoplePay360/ui/globals.css";
+
+@layer base {
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "tnum";
+    @apply bg-background text-foreground antialiased;
+  }
+
+  * {
+    scrollbar-color: color-mix(in oklab, var(--border) 80%, transparent)
+      transparent;
+    scrollbar-width: thin;
+  }
+}
+
+@layer components {
+  .field-control {
+    @apply h-10 w-full rounded-lg border border-input bg-background px-3 text-foreground text-xs outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15;
+  }
+
+  .status-pill-active {
+    @apply inline-flex rounded-full bg-success/15 px-2.5 py-1 font-semibold text-[10px] text-green-700 uppercase tracking-wider dark:text-green-300;
+  }
+
+  .status-pill-inactive {
+    @apply inline-flex rounded-full bg-muted px-2.5 py-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-wider;
+  }
+}
